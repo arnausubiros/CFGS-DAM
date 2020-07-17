@@ -1,0 +1,724 @@
+
+package xat_client;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Random;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+/**
+ *
+ * @author arnau
+ */
+public class Client_jframe extends javax.swing.JFrame {
+    
+    
+ //variables----------------------------------------------
+    
+    String usuariClient, dominiInternet = "localhost";
+    String clauPrivada="clau";
+    ArrayList<String> arrayListUsuaris = new ArrayList();
+    int portIP = 2222;
+    Boolean booleaConnectat = false;
+    ClauSimetrica xifrar = new ClauSimetrica();
+    
+    Socket socol;
+    BufferedReader bufferLector;
+    PrintWriter escriptorImpressio;
+    
+    
+ // metodes-------------------------------------------------------------------------------------
+    
+    public void filEscolta() 
+    {
+         Thread IncomingReader = new Thread(new LectorEntrant()); //subclasse LectorEntran implementa la interficie Runnable
+         IncomingReader.start();
+    }
+    
+    public void afegirUsuari(String dades) 
+    {
+         arrayListUsuaris.add(dades);
+    }
+    
+    
+    public void eliminarUsuari(String dades) 
+    {
+         textArea_XatClient.append(dades + " està fora de línia.\n");
+    }
+    
+    
+    public void escriureUsuaris() 
+    {
+         String[] llistaTemporal = new String[(arrayListUsuaris.size())];
+         arrayListUsuaris.toArray(llistaTemporal);
+
+    }
+    
+   
+    public void enviarDesconectar() 
+    {
+        String adeu = (usuariClient + ": :Desconectat");
+        try
+        {
+            escriptorImpressio.println(adeu); 
+            escriptorImpressio.flush(); 
+        } catch (Exception e) 
+        {
+            textArea_XatClient.append("No s'ha pogut enviar el missatge de desconexió.\n");
+        }
+    }
+   
+    public void desconectarClient() 
+    {
+        try 
+        {
+            textArea_XatClient.append("Desconectat.\n");
+            socol.close();
+        } catch(Exception ex) {
+            textArea_XatClient.append("No s'ha pogut desconectar. \n");
+        }
+        booleaConnectat = false;
+        textFieldNomUsuari.setEditable(true);
+    }
+    
+
+//-------------------------------------------------------------------------------------------    
+    /*
+     Creacio de la subclasse LectorEntrant    
+     Implementa la interficie Runnable per la gestio de fils i sobre-escriu el metode run()
+            */
+                 
+    public class LectorEntrant implements Runnable        
+    {
+        @Override
+        public void run() 
+        {
+            String[] dades;
+            String dadesStream, fetOk = "Fet", connectat = "Conectat", desconectat = "Desconectat", xat = "Xat";
+
+            try 
+            {
+                while ((dadesStream = bufferLector.readLine()) != null) 
+                {
+                     dades = dadesStream.split(":");
+
+                     if (dades[2].equals(xat)) 
+                     {
+                        xifrar.afegirClau(clauPrivada);
+                        if (xifrar.desencriptar( dades[1]).equals(""))
+                            if (dades[1].equals("s'ha conectat.")||dades[1].equals("Desconectat."))
+                                textArea_XatClient.append(dades[0] + ": " +dades[1] + "\n");
+                            else
+                                textArea_XatClient.append(dades[0]+": "+"\t[Encrypted message] Heu de tenir la clau simètrica.\n");
+                        else
+                            textArea_XatClient.append(dades[0] + ":     " +xifrar.desencriptar( dades[1]) + "\n");
+                        textArea_XatClient.setCaretPosition(textArea_XatClient.getDocument().getLength());
+                     } 
+                     else if (dades[2].equals(connectat))
+                     {
+                        textArea_XatClient.removeAll();
+                        afegirUsuari(dades[0]);
+                     } 
+                     else if (dades[2].equals(desconectat)) 
+                     {
+                         eliminarUsuari(dades[0]);
+                     } 
+                     else if (dades[2].equals(fetOk)) 
+                     {
+                  
+                        escriureUsuaris();
+                       arrayListUsuaris.clear();
+                     }
+                }
+           }catch(Exception ex) { }
+        }
+    }
+
+//---------------------------------------------------------------------------------------------------------
+ //---------------------------------------------------------------------------------------------------------
+    
+    
+    
+
+    /**
+     * Creates new form Client_jframe
+     */
+    public Client_jframe() {
+        initComponents();
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        btnEnviarMissatge = new javax.swing.JButton();
+        btnClauPrivada = new javax.swing.JButton();
+        text_field_xat = new javax.swing.JTextField();
+        label_sortirApp = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        lb_address = new javax.swing.JLabel();
+        textFieldDominiIP = new javax.swing.JTextField();
+        lb_username = new javax.swing.JLabel();
+        textFieldNomUsuari = new javax.swing.JTextField();
+        lb_port = new javax.swing.JLabel();
+        lb_password = new javax.swing.JLabel();
+        textFieldPortIP = new javax.swing.JTextField();
+        textFieldPassword = new javax.swing.JTextField();
+        btn_ConectarClient = new javax.swing.JButton();
+        btn_desconectarClient = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textArea_XatClient = new javax.swing.JTextArea();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setBackground(new java.awt.Color(204, 204, 204));
+        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, null, new java.awt.Color(102, 102, 102), null, null));
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel1.setText("M09-Programacio de processos i serveis");
+
+        jLabel2.setBackground(new java.awt.Color(51, 51, 51));
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel2.setText("CFGS DAM2");
+
+        jLabel3.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("Arnau Subiros");
+
+        jLabel4.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_jframe/escola_fondo.png"))); // NOI18N
+        jLabel4.setText("jLabel4");
+        jLabel4.setOpaque(true);
+
+        jLabel5.setFont(new java.awt.Font("Dialog", 3, 18)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_jframe/ico_xat.png"))); // NOI18N
+        jLabel5.setText("CLIENT XAT ");
+        jLabel5.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(102, 102, 102), new java.awt.Color(102, 102, 102), null, null));
+
+        jLabel6.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel6.setText("UF1-Seguretat i Criptografia");
+
+        jLabel7.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel7.setText("Escola del Clot");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 206, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(45, 45, 45)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(3, 3, 3)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel3)
+                                .addGap(6, 6, 6))
+                            .addComponent(jLabel5))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBackground(new java.awt.Color(102, 102, 102));
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 799, Short.MAX_VALUE)
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
+        btnEnviarMissatge.setBackground(new java.awt.Color(0, 0, 0));
+        btnEnviarMissatge.setForeground(new java.awt.Color(255, 255, 255));
+        btnEnviarMissatge.setText("ENVIAR");
+        btnEnviarMissatge.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEnviarMissatgeActionPerformed(evt);
+            }
+        });
+
+        btnClauPrivada.setBackground(new java.awt.Color(0, 0, 0));
+        btnClauPrivada.setForeground(new java.awt.Color(255, 255, 255));
+        btnClauPrivada.setText("Clau simetrica");
+        btnClauPrivada.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClauPrivadaActionPerformed(evt);
+            }
+        });
+
+        text_field_xat.setForeground(new java.awt.Color(0, 0, 0));
+
+        label_sortirApp.setBackground(new java.awt.Color(255, 255, 204));
+        label_sortirApp.setForeground(new java.awt.Color(0, 0, 0));
+        label_sortirApp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image_jframe/iconaExit2.png"))); // NOI18N
+        label_sortirApp.setOpaque(true);
+        label_sortirApp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                label_sortirAppMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(text_field_xat, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(9, 9, 9)
+                .addComponent(btnClauPrivada, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnEnviarMissatge, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                .addComponent(label_sortirApp)
+                .addGap(24, 24, 24))
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap(117, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(text_field_xat, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnClauPrivada)
+                            .addComponent(btnEnviarMissatge, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(13, 13, 13))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addComponent(label_sortirApp, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
+            .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(68, Short.MAX_VALUE)))
+        );
+
+        jPanel4.setBackground(new java.awt.Color(204, 204, 255));
+
+        lb_address.setBackground(new java.awt.Color(0, 0, 0));
+        lb_address.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lb_address.setForeground(new java.awt.Color(255, 255, 255));
+        lb_address.setText("Nom de domini");
+        lb_address.setOpaque(true);
+
+        textFieldDominiIP.setForeground(new java.awt.Color(0, 0, 0));
+        textFieldDominiIP.setText("localhost");
+        textFieldDominiIP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldDominiIPActionPerformed(evt);
+            }
+        });
+
+        lb_username.setBackground(new java.awt.Color(0, 0, 0));
+        lb_username.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lb_username.setForeground(new java.awt.Color(255, 255, 255));
+        lb_username.setText("Usuari :");
+        lb_username.setOpaque(true);
+
+        textFieldNomUsuari.setForeground(new java.awt.Color(0, 0, 0));
+        textFieldNomUsuari.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldNomUsuariActionPerformed(evt);
+            }
+        });
+
+        lb_port.setBackground(new java.awt.Color(0, 0, 0));
+        lb_port.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lb_port.setForeground(new java.awt.Color(255, 255, 255));
+        lb_port.setText("Port :");
+        lb_port.setOpaque(true);
+
+        lb_password.setBackground(new java.awt.Color(0, 0, 0));
+        lb_password.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        lb_password.setForeground(new java.awt.Color(255, 255, 255));
+        lb_password.setText("Password : ");
+        lb_password.setOpaque(true);
+
+        textFieldPortIP.setForeground(new java.awt.Color(0, 0, 0));
+        textFieldPortIP.setText("2222");
+        textFieldPortIP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                textFieldPortIPActionPerformed(evt);
+            }
+        });
+
+        textFieldPassword.setForeground(new java.awt.Color(0, 0, 0));
+
+        btn_ConectarClient.setBackground(new java.awt.Color(51, 0, 204));
+        btn_ConectarClient.setForeground(new java.awt.Color(204, 255, 255));
+        btn_ConectarClient.setText("CONECTAR");
+        btn_ConectarClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_ConectarClientActionPerformed(evt);
+            }
+        });
+
+        btn_desconectarClient.setBackground(new java.awt.Color(255, 51, 51));
+        btn_desconectarClient.setForeground(new java.awt.Color(255, 204, 204));
+        btn_desconectarClient.setText("DESCONECTAR");
+        btn_desconectarClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_desconectarClientActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(lb_address))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(31, 31, 31)
+                        .addComponent(lb_username, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textFieldDominiIP, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                    .addComponent(textFieldNomUsuari))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addComponent(lb_password))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_port)
+                        .addGap(11, 11, 11)))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(textFieldPortIP, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(textFieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_ConectarClient, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_desconectarClient, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(23, 23, 23))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(13, 13, 13)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lb_address)
+                            .addComponent(textFieldDominiIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btn_ConectarClient, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(textFieldPortIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(lb_port, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(btn_desconectarClient)
+                        .addContainerGap(18, Short.MAX_VALUE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(textFieldNomUsuari, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
+                                .addComponent(lb_username))
+                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(lb_password)
+                                .addComponent(textFieldPassword)))
+                        .addContainerGap())))
+        );
+
+        textArea_XatClient.setEditable(false);
+        textArea_XatClient.setBackground(new java.awt.Color(0, 0, 0));
+        textArea_XatClient.setColumns(20);
+        textArea_XatClient.setFont(new java.awt.Font("Verdana", 0, 13)); // NOI18N
+        textArea_XatClient.setForeground(new java.awt.Color(255, 255, 0));
+        textArea_XatClient.setRows(5);
+        textArea_XatClient.setAlignmentX(1.0F);
+        textArea_XatClient.setAlignmentY(1.0F);
+        jScrollPane1.setViewportView(textArea_XatClient);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 811, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(411, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(10, 10, 10)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(275, Short.MAX_VALUE)))
+            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGap(111, 111, 111)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 413, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(78, Short.MAX_VALUE)))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void textFieldDominiIPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldDominiIPActionPerformed
+
+    }//GEN-LAST:event_textFieldDominiIPActionPerformed
+
+    private void textFieldNomUsuariActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldNomUsuariActionPerformed
+
+    }//GEN-LAST:event_textFieldNomUsuariActionPerformed
+
+    private void textFieldPortIPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textFieldPortIPActionPerformed
+
+    }//GEN-LAST:event_textFieldPortIPActionPerformed
+
+    private void btn_ConectarClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ConectarClientActionPerformed
+        if (booleaConnectat == false)
+        {
+            usuariClient = textFieldNomUsuari.getText();
+            textFieldNomUsuari.setEditable(false);
+            dominiInternet = textFieldDominiIP.getText();
+            textFieldDominiIP.setEditable(false);
+            portIP = Integer.parseInt(textFieldPortIP.getText());
+            textFieldPortIP.setEditable(false);
+
+            try
+            {
+                socol = new Socket(dominiInternet, portIP);
+                InputStreamReader lectorStream  = new InputStreamReader(socol.getInputStream());
+                bufferLector = new BufferedReader(lectorStream);
+                escriptorImpressio = new PrintWriter(socol.getOutputStream());
+               escriptorImpressio.println(usuariClient + ":s'ha conectat.:Conectat");
+              escriptorImpressio.flush();
+               booleaConnectat = true;
+            }
+            catch (Exception ex)
+            {
+                textArea_XatClient.append("No s'ha pogut conectar! Proveu un altre cop. \n");
+                textFieldNomUsuari.setEditable(true);
+            }
+
+            filEscolta();
+
+        } else if (booleaConnectat == true)
+        {
+            textArea_XatClient.append("Vostè ja està conectat. \n");
+        }
+    }//GEN-LAST:event_btn_ConectarClientActionPerformed
+
+    private void btn_desconectarClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_desconectarClientActionPerformed
+        enviarDesconectar();
+        desconectarClient();
+    }//GEN-LAST:event_btn_desconectarClientActionPerformed
+
+    private void btnEnviarMissatgeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarMissatgeActionPerformed
+
+        String missatgebuit = "";
+        if ((text_field_xat.getText()).equals(missatgebuit)) {
+            text_field_xat.setText("");
+            text_field_xat.requestFocus();
+        } else {
+            try {
+                xifrar.afegirClau(clauPrivada);
+                escriptorImpressio.println(usuariClient + ":" + xifrar.encriptar(text_field_xat.getText()) + ":" + "Xat");
+                escriptorImpressio.flush(); // flushes el buffer
+
+            } catch (Exception ex) {
+                textArea_XatClient.append("El missatge no s'ha pogut enviar. \n");
+            }
+            text_field_xat.setText("");
+            text_field_xat.requestFocus();
+        }
+
+        text_field_xat.setText("");
+        text_field_xat.requestFocus();
+    }//GEN-LAST:event_btnEnviarMissatgeActionPerformed
+
+    private void btnClauPrivadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClauPrivadaActionPerformed
+        try
+        {
+            clauPrivada=JOptionPane.showInputDialog(null, "Clau actual: "+clauPrivada+"\nIngresi una nova CLAU", "Clau simètrica", 1);
+            if(clauPrivada==null || clauPrivada.equals("")) JOptionPane.showMessageDialog(null, "Ingresi la CLAU!", "Error", 0);
+            else JOptionPane.showMessageDialog(null, "La clau simètrica és :" +clauPrivada);
+
+        }catch(Exception e)
+        {
+           // JOptionPane.showMessageDialog(null, "Error");
+            final JPanel panel = new JPanel();
+              JOptionPane.showMessageDialog(panel, "ERROR","Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnClauPrivadaActionPerformed
+
+    private void label_sortirAppMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_label_sortirAppMouseClicked
+          System.exit(0);
+    }//GEN-LAST:event_label_sortirAppMouseClicked
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Client_jframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Client_jframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Client_jframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Client_jframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Client_jframe().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClauPrivada;
+    private javax.swing.JButton btnEnviarMissatge;
+    private javax.swing.JButton btn_ConectarClient;
+    private javax.swing.JButton btn_desconectarClient;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel label_sortirApp;
+    private javax.swing.JLabel lb_address;
+    private javax.swing.JLabel lb_password;
+    private javax.swing.JLabel lb_port;
+    private javax.swing.JLabel lb_username;
+    private javax.swing.JTextArea textArea_XatClient;
+    private javax.swing.JTextField textFieldDominiIP;
+    private javax.swing.JTextField textFieldNomUsuari;
+    private javax.swing.JTextField textFieldPassword;
+    private javax.swing.JTextField textFieldPortIP;
+    private javax.swing.JTextField text_field_xat;
+    // End of variables declaration//GEN-END:variables
+}
